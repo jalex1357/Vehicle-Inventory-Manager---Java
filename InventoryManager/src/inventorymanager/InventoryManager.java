@@ -1,6 +1,7 @@
 
 package inventorymanager;
 
+
 import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.*;
@@ -11,6 +12,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 public class InventoryManager extends JFrame{
     //private variables for buildManager//
@@ -34,6 +36,7 @@ public class InventoryManager extends JFrame{
     private JButton submitNewEmployee;
     
     public InventoryManager(String username, String password) throws FileNotFoundException, SQLException, IOException{
+        
         loginVerify getUserStatusLevel = new loginVerify();
         
         String statusLevel = getUserStatusLevel.getStatusLevel(username, password);
@@ -110,7 +113,7 @@ public class InventoryManager extends JFrame{
                 
                 JFrame getNewEmpInfo = new JFrame();
                 getNewEmpInfo.setLayout(null);
-                getNewEmpInfo.setPreferredSize(new Dimension(265,190));
+                getNewEmpInfo.setPreferredSize(new Dimension(265,220));
                 getNewEmpInfo.setLocationRelativeTo(null);
                 
                 newUsername = new JLabel("Create Username");
@@ -124,7 +127,21 @@ public class InventoryManager extends JFrame{
                 String[] ranks = {"New Hire", "Employee (Level 1)","Employee (Level 2)", "Manager (Level 1)","Manager (Level 2)", "Manager (Level 3)", "Admin"};
                 getRank = new JComboBox(ranks);
                 
+                Employee emp = new Employee();
+                String[] allDepts = null;
+                try {
+                    allDepts = emp.getDepts();
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                 
                 rank = new JLabel("Rank");
+                
+                JLabel dept = new JLabel("Department");
+                JComboBox getDept = new JComboBox(allDepts);
+                
+                
                 
                 submitNewEmployee = new JButton("Submit");
                 submitNewEmployee.addActionListener(new submitNewEmployeeListener());
@@ -137,7 +154,9 @@ public class InventoryManager extends JFrame{
                 getLName.setBounds(115,61, 135, 20);
                 rank.setBounds(10, 91, 100, 20);
                 getRank.setBounds(115, 91, 135, 20);
-                submitNewEmployee.setBounds(115, 121, 75, 30);
+                dept.setBounds(10, 121, 100, 20);
+                getDept.setBounds(115, 121, 135, 20);
+                submitNewEmployee.setBounds(115, 151, 75, 30);
                 
                 getRank.setSelectedItem("Employee (Level 2)");
                 getNewEmpInfo.add(newUsername);
@@ -148,6 +167,8 @@ public class InventoryManager extends JFrame{
                 getNewEmpInfo.add(getLName);
                 getNewEmpInfo.add(rank);
                 getNewEmpInfo.add(getRank);
+                getNewEmpInfo.add(dept);
+                getNewEmpInfo.add(getDept);
                 getNewEmpInfo.add(submitNewEmployee);
                 
                 
@@ -290,6 +311,15 @@ public class InventoryManager extends JFrame{
         title.setFont(titleFont);
         panel.add(title);
         
+        JLabel addSection = new JLabel("Add Vehicle");
+        
+        Font sectionTitleFont = new Font("Arial", Font.BOLD, 16);
+        
+        addSection.setBounds(115,105,100, 30);
+        addSection.setFont(sectionTitleFont);
+        
+        panel.add(addSection);
+        
         
         String[] makeList = new String[makesList.size()];
         for(int count = 0; count<makesList.size(); count++){
@@ -298,33 +328,33 @@ public class InventoryManager extends JFrame{
         make = new JComboBox(makeList);
         
         makeLabel = new JLabel("Make: ");
-        makeLabel.setBounds(75, 125, 100, 30);
+        makeLabel.setBounds(75, 145, 100, 30);
         panel.add(makeLabel);
         
-        make.setBounds(135, 125, 130, 30);
+        make.setBounds(135, 145, 130, 30);
         panel.add(make);
         
         
         modelLabel = new JLabel("Model: ");
-        modelLabel.setBounds(75, 165, 100, 30);
+        modelLabel.setBounds(75, 185, 100, 30);
         panel.add(modelLabel);
         
         //Create the vin text field
         enterVin = new JLabel("Enter VIN: ");
-        enterVin.setBounds(75, 200, 100, 30);
+        enterVin.setBounds(75, 220, 100, 30);
         panel.add(enterVin);
         
         VIN = new JTextField(30);
         VIN.setEnabled(false);
         VIN.setEditable(false);
-        VIN.setBounds(135, 200, 130, 30);
+        VIN.setBounds(135, 220, 130, 30);
         panel.add(VIN);
         
         
         submit = new JButton("Save Item");
         submit.addActionListener(new saveItemListener());
         
-        submit.setBounds(150, 235, 90, 30);
+        submit.setBounds(150, 255, 90, 30);
         panel.add(submit);
         
         
@@ -348,7 +378,7 @@ public class InventoryManager extends JFrame{
 
                 model = new JComboBox(modelList);
 
-                model.setBounds(135, 165, 130, 30);
+                model.setBounds(135, 185, 130, 30);
                 panel.add(model);
                 panel.revalidate();
 
@@ -381,15 +411,16 @@ public class InventoryManager extends JFrame{
         //allow certain actions or disallow
         InventoryManager login = new InventoryManager("login");
     }
-    private class submitNewEmployeeListener implements ActionListener{
+    private class submitNewEmployeeListener implements ActionListener{        
         public void actionPerformed(ActionEvent e){
+           
             Employee employee = new Employee();
             
             String username = getNewUsername.getText();
             String fName = getFName.getText();
             String lName = getLName.getText();
             String empRank = getRank.getSelectedItem().toString();
-            String dept = null;
+            String dept = (String) getDept.getSelectedItem();
             
             
             try {

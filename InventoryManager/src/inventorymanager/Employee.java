@@ -1,5 +1,6 @@
 package inventorymanager;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -26,10 +27,25 @@ public class Employee{
         count+=1;
         int newEmployeeId = count;
         String passcode = fName.toLowerCase() + lName.toLowerCase();
-        num = myStmt.executeUpdate("INSERT INTO users VALUES ("+newEmployeeId+", '"+username+"', '"+passcode+"', '"+fName+"', '"+lName+"', '"+empRank+"', 'Normal', 'Normal', '"+dept+"', 'default')");
+        num = myStmt.executeUpdate("INSERT INTO users VALUES ("+newEmployeeId+", '"+username+"', '"+passcode+"', '"+fName+"', '"+lName+"', '"+empRank+"', 'Normal', 'Normal', '"+dept+"', 'Default')");
         JOptionPane.showMessageDialog(null, "New Employee Submission Has Been Issued.");
     }
-    
+    public String[] getDepts() throws SQLException{
+        short numDept=0;
+        myRs = myStmt.executeQuery("select Department from dept");
+        ArrayList<String> d = new ArrayList<>();
+        
+        while(myRs.next()){
+            d.add(myRs.getString("Department"));
+        }
+        String[] dept = new String[d.size()];
+        
+        for(int count = 0; count < d.size(); count++){
+            dept[count] = d.get(count);
+        }
+        
+        return dept;
+    }
     public void fireEmployee(){
         
     }
