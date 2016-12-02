@@ -6,6 +6,9 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class loginVerify{
+    private String username;
+    private String password;
+    private int employeeId = 0;
     private int loginCount = 0;
     String verifyPassword = null;
     Connection myConn = null;
@@ -59,11 +62,13 @@ public class loginVerify{
         return status;
     }
     public Boolean check(String username, String password){
-        Boolean doesNotContainSQL = validate(username);
+        this.username = username;
+        this.password = password;
+        Boolean doesNotContainSQL = validate(this.username);
         Boolean isVerified;
         
         if(doesNotContainSQL){
-            isVerified = checkAgainstDB(username, password);
+            isVerified = checkAgainstDB(this.username, this.password);
         }
         else{
             isVerified = false;
@@ -96,5 +101,32 @@ public class loginVerify{
             return true;
         }
         return false;
+    }
+    public String isPasswordDefault(String username, String password) throws SQLException{
+        
+        
+        myRs = myStmt.executeQuery("select employeeId, isPasswordDefault from users where username = '"+username+"' and passcode = '"+password+"'");
+        while(myRs.next()){
+            //this is verifying that the users password is not the same as the default password
+            //It will force them to change their password to a unique password
+            this.employeeId = myRs.getInt("employeeId");
+            String defaultStatus = myRs.getString("isPasswordDefault");
+            if(defaultStatus.equals("Default")){
+                return "isDefault";
+            }
+            
+        }
+        return "isUnique";
+    }
+    public void setNewPassword(String username, String oldPassword, String newPassword) throws SQLException{
+        //Set new password
+        /*int empId = 0;
+        myRs = myStmt.executeQuery("select employeeId from users where username = '"+username+"' and passcode = '"+oldPassword+"'");*/
+       /* while(myRs.next()){
+            empId = myRs.getInt("employeeId");
+        }*/
+        int isSet = myStmt.executeUpdate("Update users set passcode = '"+ newPassword+"' where employeeId = "+this.employeeId);
+        isSet = myStmt.executeUpdate("Update users set isPasswordDefault = 'Unique' where employeeId = "+this.employeeId);
+        JOptionPane.showMessageDialog(null, "Your password has been updated.");
     }
 }

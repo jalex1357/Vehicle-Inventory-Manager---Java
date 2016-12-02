@@ -2,7 +2,6 @@
 package inventorymanager;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import javax.swing.*;
 import java.awt.event.*;
@@ -95,6 +94,10 @@ public class InventoryManager extends JFrame{
         if(statusLevel.equals(mgmt[0]) || statusLevel.equals(mgmt[1])||statusLevel.equals(mgmt[2])||statusLevel.equals(mgmt[3])){
             //set the ability to add to the make/models
         }
+        if(statusLevel.equals("Admin")){
+            //set ability for creation of departments. Admins only!!!
+                        
+        }
         if(statusLevel.equals("Admin") || statusLevel.equals("Manager (Level 2") || statusLevel.equals("Manager (Level 3)")){
             JMenu personnel = new JMenu("Personnel");
             
@@ -170,8 +173,9 @@ public class InventoryManager extends JFrame{
             empMaintenance.addActionListener((ActionEvent event) ->{
                 //Bring up maintenance menu with tabs
                 JFrame tab = new JFrame();
-                
+                tab.setResizable(false);
                 JTabbedPane maintenance = new JTabbedPane();
+                
                 //maintenance.setTitle("Employee Maintenance");
                 getContentPane().add(maintenance);
                 
@@ -417,12 +421,37 @@ public class InventoryManager extends JFrame{
             
             //validate for attempted sql statement
             
-            Boolean isVerified = verify.check(getUsername.getText().toLowerCase(), getPassword.getText().toLowerCase());
+            Boolean isVerified = verify.check(getUsername.getText(), getPassword.getText());
             
             if(isVerified == false){
                 JOptionPane.showMessageDialog(null, "Invalid Username or Password.");
             }
             else{
+                
+                try {
+                    //Forcing user to create a unique password based on whether user has a default password in db
+                    String defaultStatus = verify.isPasswordDefault(getUsername.getText().toLowerCase(), getPassword.getText().toLowerCase());
+                    String oldPassword = getUsername.getText()+getPassword.getText();
+                    if(defaultStatus.equals("isDefault")){
+                        String newPassword = JOptionPane.showInputDialog("Input a new unique password.");
+                        String newPasswordRepeat = JOptionPane.showInputDialog("Re-Enter your new unique password.");
+                        //FIX REQUIRED:  AT LEAST ONE LOOP IS NOT ACTIVATING: CHECK BOTH
+                        while(!newPassword.equals(newPasswordRepeat)){
+                            newPassword = JOptionPane.showInputDialog("New password entries did not match.\nInput a new unique password.");
+                            newPasswordRepeat = JOptionPane.showInputDialog("Re-Enter your new unique password.");
+                        }
+                        while(newPassword.toLowerCase().equals(oldPassword.toLowerCase())){
+                            newPassword = JOptionPane.showInputDialog("You must enter a NEW UNIQUE password");
+                            newPasswordRepeat = JOptionPane.showInputDialog("Re-Enter your NEW UNIQUE password");
+                            if(newPassword.equals(newPasswordRepeat) && !newPassword.equals(oldPassword)){
+                                break;
+                            }
+                        }
+                        verify.setNewPassword(getUsername.getText(), oldPassword, newPassword);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 setVisible(false);
                 try { 
                     InventoryManager start = new InventoryManager(getUsername.getText().toLowerCase(), getPassword.getText().toLowerCase());

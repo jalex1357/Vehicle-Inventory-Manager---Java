@@ -26,7 +26,7 @@ public class Employee{
         count+=1;
         int newEmployeeId = count;
         String passcode = fName.toLowerCase() + lName.toLowerCase();
-        num = myStmt.executeUpdate("INSERT INTO users VALUES ("+newEmployeeId+", '"+username+"', '"+passcode+"', '"+fName+"', '"+lName+"', '"+empRank+"', 'Normal', 'Normal', '"+dept+"')");
+        num = myStmt.executeUpdate("INSERT INTO users VALUES ("+newEmployeeId+", '"+username+"', '"+passcode+"', '"+fName+"', '"+lName+"', '"+empRank+"', 'Normal', 'Normal', '"+dept+"', 'default')");
         JOptionPane.showMessageDialog(null, "New Employee Submission Has Been Issued.");
     }
     
