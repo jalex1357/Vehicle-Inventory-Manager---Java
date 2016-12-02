@@ -2,6 +2,7 @@
 package inventorymanager;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import javax.swing.*;
 import java.awt.event.*;
@@ -22,15 +23,15 @@ public class InventoryManager extends JFrame{
     
     //private variables for buildLogin//
     private JLabel username, password;
-    protected JTextField getUsername;
+    private JTextField getUsername;
     private JPasswordField getPassword;
-    protected JButton loginButton;
+    private JButton loginButton;
     private JPanel loginPanel;
     
     //private variables for addEmployee
-    private JLabel newUsername, fname, lname, rank;
+    private JLabel newUsername, fname, lname, rank, dept;
     private JTextField getNewUsername, getFName, getLName;
-    private JComboBox getRank;
+    private JComboBox getRank, getDept;
     private JButton submitNewEmployee;
     
     public InventoryManager(String username, String password) throws FileNotFoundException, SQLException, IOException{
@@ -173,16 +174,63 @@ public class InventoryManager extends JFrame{
                 JTabbedPane maintenance = new JTabbedPane();
                 //maintenance.setTitle("Employee Maintenance");
                 getContentPane().add(maintenance);
+                
+                //create the add new employee tab
                 JPanel addEmp = new JPanel();
+                ////////////////////////////////////
+                addEmp.setLayout(null);
+                newUsername = new JLabel("Create Username");
+                fname = new JLabel("First Name");
+                lname = new JLabel("Last Name");
+                
+                getNewUsername = new JTextField(15);
+                getFName = new JTextField(15);
+                getLName = new JTextField(15);
+                
+                String[] ranks = {"New Hire", "Employee (Level 1)","Employee (Level 2)", "Manager (Level 1)","Manager (Level 2)", "Manager (Level 3)", "Admin"};
+                getRank = new JComboBox(ranks);
+                
+                rank = new JLabel("Rank");
+                
+                submitNewEmployee = new JButton("Submit");
+                submitNewEmployee.addActionListener(new submitNewEmployeeListener());
+                
+                newUsername.setBounds(40,30,100,20);
+                getNewUsername.setBounds(145,30,135, 20);
+                fname.setBounds(40,60, 100, 20);
+                getFName.setBounds(145, 60, 135, 20);
+                lname.setBounds(40,90, 100, 20);
+                getLName.setBounds(145,90, 135, 20);
+                rank.setBounds(40, 120, 100, 20);
+                getRank.setBounds(145, 120, 135, 20);
+                submitNewEmployee.setBounds(145, 150, 75, 30);
+                
+                getRank.setSelectedItem("New Hire");
+                
+                addEmp.add(newUsername);
+                addEmp.add(getNewUsername);
+                addEmp.add(fname);
+                addEmp.add(getFName);
+                addEmp.add(lname);
+                addEmp.add(getLName);
+                addEmp.add(rank);
+                addEmp.add(getRank);
+                addEmp.add(submitNewEmployee);
+                
+                //////////////////////////////////
+                //create the terminate/suspend tab
                 JPanel fireEmp = new JPanel();
-                JLabel tabTitleAdd = new JLabel();
-                tabTitleAdd.setText("Add Employee");
-                JLabel tabTitleFire = new JLabel();
-                tabTitleFire.setText("Terminate/Suspend");
-                addEmp.add(tabTitleAdd);
-                fireEmp.add(tabTitleFire);
+                
+                //Create the promotions tab
+                JPanel promoteEmp = new JPanel();
+                
+                //Change usernames here
+                JPanel changeAuth = new JPanel();
+                
                 maintenance.addTab("Add Employee", addEmp);
-                maintenance.addTab("Terminate/Suspend", fireEmp);
+                maintenance.addTab("Terminate", fireEmp);
+                maintenance.addTab("Promotions", promoteEmp);
+                maintenance.addTab("Authorizations", changeAuth);
                 
                 tab.add(maintenance);
                 tab.pack();
@@ -337,13 +385,18 @@ public class InventoryManager extends JFrame{
             String fName = getFName.getText();
             String lName = getLName.getText();
             String empRank = getRank.getSelectedItem().toString();
+            String dept = null;
             
             
             try {
-                employee.createEmployee(username, fName, lName, empRank);
+                employee.createEmployee(username, fName, lName, empRank, dept);
             } catch (SQLException ex) {
                 Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
             }
+            getNewUsername.setText("");
+            getFName.setText("");
+            getLName.setText("");
+            getRank.setSelectedItem("New Hire");
         }
     }
     private class saveItemListener implements ActionListener{

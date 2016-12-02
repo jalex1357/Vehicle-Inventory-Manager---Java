@@ -4,10 +4,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 public class Employee{
-    Connection myConn = null;
-    Statement myStmt = null;
-    ResultSet myRs = null;
-    int num = 0;
+    /*private*/Connection myConn = null;
+    /*private */Statement myStmt = null;
+    /*private*/ ResultSet myRs = null;
+    /*private*/int num = 0;
     
     public Employee(){
          try {
@@ -17,7 +17,7 @@ public class Employee{
             Logger.getLogger(loginVerify.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void createEmployee(String username, String fName, String lName, String empRank)throws SQLException{
+    public void createEmployee(String username, String fName, String lName, String empRank, String dept)throws SQLException{
         int count = 0;
         myRs = myStmt.executeQuery("select * from users");
         while(myRs.next()){
@@ -26,7 +26,7 @@ public class Employee{
         count+=1;
         int newEmployeeId = count;
         String passcode = fName.toLowerCase() + lName.toLowerCase();
-        num = myStmt.executeUpdate("INSERT INTO users VALUES ("+newEmployeeId+", '"+username+"', '"+passcode+"', '"+fName+"', '"+lName+"', '"+empRank+"', 'Normal')");
+        num = myStmt.executeUpdate("INSERT INTO users VALUES ("+newEmployeeId+", '"+username+"', '"+passcode+"', '"+fName+"', '"+lName+"', '"+empRank+"', 'Normal', 'Normal', '"+dept+"')");
         JOptionPane.showMessageDialog(null, "New Employee Submission Has Been Issued.");
     }
     
