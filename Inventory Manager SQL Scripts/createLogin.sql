@@ -10,12 +10,15 @@ CREATE TABLE users(
 	lastName varchar(64) DEFAULT NULL,
 	statusLevel varchar(64) DEFAULT NULL,
 	isPasswordDefault varchar(64) DEFAULT NULL,
+    accountStatus varchar(64) DEFAULT NULL,
+    employeeStatus varchar(64) DEFAULT NULL,
+    dept varchar(64) DEFAULT NULL,    
 	PRIMARY KEY (employeeId)
 	)ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = latin1;
 
-INSERT INTO users (employeeId, username, passcode, firstName, lastName, statusLevel, accountStatus, employeeStatus, dept)
+INSERT INTO users (employeeId, username, passcode, firstName, lastName, statusLevel, accountStatus, employeeStatus, dept, isPasswordDefault)
 	VALUES (1, 'test', 'testaccount', 'Test', 'Account', 'Admin', 'Normal', 'Normal', 'Technology', 'Default');
-INSERT INTO users (employeeId, username, passcode, firstName, lastName, statusLevel, accountStatus, employeeStatus, dept)
+INSERT INTO users (employeeId, username, passcode, firstName, lastName, statusLevel, accountStatus, employeeStatus, dept, isPasswordDefault)
 	VALUES (2, 'johnathan', 'password', 'Johnathan', 'Alexander', 'New Hire', 'Normal', 'Normal', 'Technology', 'Default');
     
 
