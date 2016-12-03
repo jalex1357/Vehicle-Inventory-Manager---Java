@@ -35,6 +35,8 @@ public class InventoryManager extends JFrame{
     private JComboBox getRank, getDept;
     private JButton submitNewEmployee;
     
+    
+    
     public InventoryManager(String username, String password) throws FileNotFoundException, SQLException, IOException{
         
         loginVerify getUserStatusLevel = new loginVerify();
@@ -81,7 +83,7 @@ public class InventoryManager extends JFrame{
         String status = "Employee";
         return status;
     }
-    public void createMenuBar(String statusLevel){
+    final public void createMenuBar(String statusLevel){
         JMenuBar menubar = new JMenuBar();
         JMenu file = new JMenu("File");
         
@@ -94,12 +96,41 @@ public class InventoryManager extends JFrame{
         file.add(eMenuItem);
         menubar.add(file);
         String[] mgmt = {"Manager (Level 1)", "Manager (Level 2)", "Manager (Level 3)", "Admin"};
+        JMenu create = new JMenu("Create");
         if(statusLevel.equals(mgmt[0]) || statusLevel.equals(mgmt[1])||statusLevel.equals(mgmt[2])||statusLevel.equals(mgmt[3])){
             //set the ability to add to the make/models
+            
+            
+            JMenuItem newMake = new JMenuItem("New Make");
+            newMake.setToolTipText("Create A New Vehicle Make");
+            newMake.addActionListener((ActionEvent event) ->{
+                String createNewMake = JOptionPane.showInputDialog("Enter New Make");
+            });
+            create.add(newMake);
+            
+            JMenuItem newModel = new JMenuItem("New Model");
+            newModel.setToolTipText("Create A New Vehicle Model");
+            newModel.addActionListener((ActionEvent event) -> {
+                //create model
+                //Create a JFrame that has a JComboBox
+                //that gets all the current makes from db
+                //Allow user to select one and then enabled a
+                //jtextfield to allow the user to enter a new model
+                //then update db
+            });
+            create.add(newModel);
+            
+            menubar.add(create);
         }
         if(statusLevel.equals("Admin")){
             //set ability for creation of departments. Admins only!!!
-                        
+            JMenuItem newDepartment = new JMenuItem("New Department");
+            newDepartment.setToolTipText("Create A New Department");
+            newDepartment.addActionListener((ActionEvent event) ->{
+                String createNewDepartment = JOptionPane.showInputDialog("Enter New Department");
+            });
+            create.add(newDepartment);
+            menubar.add(create);
         }
         if(statusLevel.equals("Admin") || statusLevel.equals("Manager (Level 2") || statusLevel.equals("Manager (Level 3)")){
             JMenu personnel = new JMenu("Personnel");
@@ -138,8 +169,8 @@ public class InventoryManager extends JFrame{
                  
                 rank = new JLabel("Rank");
                 
-                JLabel dept = new JLabel("Department");
-                JComboBox getDept = new JComboBox(allDepts);
+                dept = new JLabel("Department");
+                getDept = new JComboBox(allDepts);
                 
                 
                 
@@ -358,8 +389,7 @@ public class InventoryManager extends JFrame{
         panel.add(submit);
         
         
-        make.addActionListener (new ActionListener () {
-        public void actionPerformed(ActionEvent e) {
+        make.addActionListener ((ActionEvent e) -> {
             ArrayList<String> modelsList = null;
             String makeChoice = (String)make.getSelectedItem();
             if(!makeChoice.equals("")){
@@ -383,11 +413,11 @@ public class InventoryManager extends JFrame{
                 panel.revalidate();
 
                 model.addActionListener((ActionEvent f) -> {
-                String modelChoice = (String)model.getSelectedItem();
-                if(!modelChoice.equals("")){
-                    VIN.setEnabled(true);
-                    VIN.setEditable(true);
-                }
+                    String modelChoice = (String)model.getSelectedItem();
+                    if(!modelChoice.equals("")){
+                        VIN.setEnabled(true);
+                        VIN.setEditable(true);
+                    }
                 });
             }
             else{
@@ -397,11 +427,25 @@ public class InventoryManager extends JFrame{
                     panel.remove(model);
                 }
             }
-            
-            
-            
-        }
         });
+        
+        //create the right side of main screen after login
+        JLabel sectionLabelSearch = new JLabel("Search VIN");
+        sectionLabelSearch.setFont(sectionTitleFont);
+        JLabel vinLabel = new JLabel("Enter VIN:");
+        JTextField getVIN = new JTextField(15);
+        JButton searchVin = new JButton("Search");
+        searchVin.addActionListener(new searchVinActionListener());
+        
+        sectionLabelSearch.setBounds(350, 105, 100, 30);
+        vinLabel.setBounds(300, 145, 100,30);
+        getVIN.setBounds(370, 145, 100, 30);
+        searchVin.setBounds(370,255,90,30);
+        
+        panel.add(sectionLabelSearch);
+        panel.add(vinLabel);
+        panel.add(getVIN);
+        panel.add(searchVin);
         
     }
     
@@ -410,6 +454,11 @@ public class InventoryManager extends JFrame{
         //then based on access modifier in db
         //allow certain actions or disallow
         InventoryManager login = new InventoryManager("login");
+    }
+    private class searchVinActionListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            //Search VIN for vehicle information
+        }
     }
     private class submitNewEmployeeListener implements ActionListener{        
         public void actionPerformed(ActionEvent e){
@@ -488,9 +537,7 @@ public class InventoryManager extends JFrame{
                     InventoryManager start = new InventoryManager(getUsername.getText().toLowerCase(), getPassword.getText().toLowerCase());
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SQLException ex) {
-                    Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
+                } catch (SQLException | IOException ex) {
                     Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

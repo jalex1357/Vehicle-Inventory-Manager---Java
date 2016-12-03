@@ -31,7 +31,7 @@ public class Employee{
         JOptionPane.showMessageDialog(null, "New Employee Submission Has Been Issued.");
     }
     public String[] getDepts() throws SQLException{
-        short numDept=0;
+        
         myRs = myStmt.executeQuery("select Department from dept");
         ArrayList<String> d = new ArrayList<>();
         
