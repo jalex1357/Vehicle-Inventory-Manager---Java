@@ -32,7 +32,7 @@ public class Employee{
     }
     public String[] getDepts() throws SQLException{
         
-        myRs = myStmt.executeQuery("select Department from dept");
+        myRs = myStmt.executeQuery("select Department from dept order by Department");
         ArrayList<String> d = new ArrayList<>();
         
         while(myRs.next()){
@@ -46,13 +46,17 @@ public class Employee{
         
         return dept;
     }
+    public String[] getEmployees(String dept){
+        
+    }
     public void fireEmployee(){
         
     }
-    public void suspendEmployee(){
+    
+    public void promoteEmployee(){
         
     }
-    public void promoteEmployee(){
+    public void newDepartment(String newDepartment){
         
     }
     

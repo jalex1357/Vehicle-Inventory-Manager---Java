@@ -1,3 +1,27 @@
+//ways of doing stuff:
+/*
+to terminate an employee:
+try to do this:
+use jcombobox to select a department
+which then autofills the second jcombobox with employee names
+based on whether employee status is normal
+
+after termination is complete:
+
+programmatically close the window and then
+rerun the whatever opens it
+
+this keeps 'management' from having to already know 
+too much information to get the correct employee
+to be able to terminate that employee.
+After all they may only know first name and department and there
+could be multiple people with the same name in the same department and 
+that includes last name as well
+*/
+
+
+
+
 
 package inventorymanager;
 
@@ -104,7 +128,21 @@ public class InventoryManager extends JFrame{
             JMenuItem newMake = new JMenuItem("New Make");
             newMake.setToolTipText("Create A New Vehicle Make");
             newMake.addActionListener((ActionEvent event) ->{
-                String createNewMake = JOptionPane.showInputDialog("Enter New Make");
+                String addNewMake = JOptionPane.showInputDialog("Enter New Make");
+                while(addNewMake.equals("")){
+                    addNewMake = JOptionPane.showInputDialog("Enter New Make. Blank Values Are Not Accepted.");
+                }
+                
+                try {
+                    vehicles vehicle = new vehicles();
+                    if(!vehicle.checkMake(addNewMake))
+                        vehicle.createNewMake(addNewMake);
+                    else{
+                        JOptionPane.showMessageDialog(null, "That Make Already Exists");
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
             create.add(newMake);
             
@@ -117,6 +155,7 @@ public class InventoryManager extends JFrame{
                 //Allow user to select one and then enabled a
                 //jtextfield to allow the user to enter a new model
                 //then update db
+                
             });
             create.add(newModel);
             
@@ -189,7 +228,7 @@ public class InventoryManager extends JFrame{
                 getDept.setBounds(115, 121, 135, 20);
                 submitNewEmployee.setBounds(115, 151, 75, 30);
                 
-                getRank.setSelectedItem("Employee (Level 2)");
+                getRank.setSelectedItem("New Hire");
                 getNewEmpInfo.add(newUsername);
                 getNewEmpInfo.add(getNewUsername);
                 getNewEmpInfo.add(fname);
@@ -277,6 +316,20 @@ public class InventoryManager extends JFrame{
                 //create the terminate/suspend tab
                 JPanel fireEmp = new JPanel();
                 
+                Employee emp2 = new Employee();
+                
+                dept = new JLabel("Department");
+                getDept = null;
+                try {
+                    getDept = new JComboBox(emp2.getDepts());
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                dept.setBounds(40,30,100,20);
+                getDept.setBounds(145,30,135, 20);
+                
+                fireEmp.add(dept);
+                fireEmp.add(getDept);
                 //Create the promotions tab
                 JPanel promoteEmp = new JPanel();
                 
@@ -390,9 +443,11 @@ public class InventoryManager extends JFrame{
         
         
         make.addActionListener ((ActionEvent e) -> {
+            
             ArrayList<String> modelsList = null;
             String makeChoice = (String)make.getSelectedItem();
             if(!makeChoice.equals("")){
+                
                 try {
                     modelsList = getVehicles.getModels(makeChoice);
                     
@@ -402,7 +457,7 @@ public class InventoryManager extends JFrame{
                  
                 String[] modelList = new String[modelsList.size()];
             
-                for(int count = 0; count<makesList.size()-1; count++){
+                for(int count = 0; count<modelsList.size(); count++){
                     modelList[count] = modelsList.get(count);
                 }
 
@@ -411,6 +466,8 @@ public class InventoryManager extends JFrame{
                 model.setBounds(135, 185, 130, 30);
                 panel.add(model);
                 panel.revalidate();
+                
+                
 
                 model.addActionListener((ActionEvent f) -> {
                     String modelChoice = (String)model.getSelectedItem();
