@@ -14,3 +14,10 @@ CREATE TABLE models(
     
 INSERT INTO models (Model) VALUES ('Honda:Odyssey');
 
+drop table if exists vehicles;
+
+CREATE TABLE vehicles (
+	make varchar(64) NOT NULL,
+    model varchar(64) NOT NULL,
+    VIN varchar(64) NOT NULL,
+    User_ID varchar(32) NOT NULL);
