@@ -68,5 +68,17 @@ public class vehicles{
     public void createNewModel(String newModel){
         
     }
-    
+    public Boolean addVehicle(String make, String model, String VIN) throws SQLException{
+        myRs = myStmt.executeQuery("select VIN from vehicles where VIN = '"+VIN+"'");
+        while(myRs.next()){
+            String checkVIN = myRs.getString("VIN");
+            if(checkVIN.equals(VIN)){
+                return false;
+            }
+        }
+        
+        int update = myStmt.executeUpdate("insert into vehicles (make, model, VIN) VALUES ('"+make+"', '"+model+"', '"+VIN+"')");
+        return true;
+        
+    }
 }

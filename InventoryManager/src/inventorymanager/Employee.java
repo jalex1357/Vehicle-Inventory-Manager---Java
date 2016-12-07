@@ -46,18 +46,49 @@ public class Employee{
         
         return dept;
     }
-    public String[] getEmployees(String dept){
+    /*public String[] getEmployees(String dept){
         
-    }
+    }*/
     public void fireEmployee(){
         
+    }
+    public ArrayList<String> getEmps(String dept)throws SQLException{
+        ArrayList<String> employees = new ArrayList<>();
+        myRs = myStmt.executeQuery("select firstName, lastName from users where dept = '"+dept+"' order by firstName");
+        while(myRs.next()){
+            if(!myRs.getString("firstName").equals("Test"))
+                employees.add(myRs.getString("firstName") + " "+ myRs.getString("lastName"));
+        }
+        return employees;
     }
     
     public void promoteEmployee(){
         
     }
-    public void newDepartment(String newDepartment){
+    public Boolean newDepartment(String[] depts, String newDepartment)throws SQLException{
+        String dept = "";
         
+        String formatNewDepartment = "";
+        
+        //This next for loop used to capitalize first letter of user input
+        char[] newDeptSplit = newDepartment.toCharArray();
+        for(int count = 0; count<newDeptSplit.length; count++){
+            if(count == 0){
+                formatNewDepartment += Character.toString(newDeptSplit[0]).toUpperCase();
+            }
+            else{
+                formatNewDepartment += newDeptSplit[count];
+            }
+        }
+        
+        
+        for(int count = 0; count<depts.length; count++){
+            dept = depts[count];
+            if(dept.equals(formatNewDepartment)){
+                return false;
+            }
+        }
+        int isAdded = myStmt.executeUpdate("insert into dept(Department) values('"+formatNewDepartment+"')");
+        return true;
     }
-    
 }

@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 
 
 public class InventoryManager extends JFrame{
+    int makeChoiceCounter = 0;
     //private variables for buildManager//
     private JPanel panel;
     private JComboBox make, model, type;
@@ -59,9 +60,11 @@ public class InventoryManager extends JFrame{
     private JComboBox getRank, getDept;
     private JButton submitNewEmployee;
     
+    private final JComboBox getEmp = new JComboBox();
     
     
     public InventoryManager(String username, String password) throws FileNotFoundException, SQLException, IOException{
+        
         
         loginVerify getUserStatusLevel = new loginVerify();
         
@@ -111,14 +114,27 @@ public class InventoryManager extends JFrame{
         JMenuBar menubar = new JMenuBar();
         JMenu file = new JMenu("File");
         
+        JMenuItem logoff = new JMenuItem("Log Off");
+        logoff.addActionListener((ActionEvent event) ->{
+            setVisible(false);
+            InventoryManager newInstance = new InventoryManager("Login");
+        });
+        
+        
         JMenuItem eMenuItem = new JMenuItem("Exit");
         eMenuItem.setToolTipText("Exit Application");
         eMenuItem.addActionListener((ActionEvent event) ->{
             System.exit(0);
         });
         
+        
+        file.add(logoff);
+        file.add(new JSeparator());
         file.add(eMenuItem);
+        
         menubar.add(file);
+        
+        
         String[] mgmt = {"Manager (Level 1)", "Manager (Level 2)", "Manager (Level 3)", "Admin"};
         JMenu create = new JMenu("Create");
         if(statusLevel.equals(mgmt[0]) || statusLevel.equals(mgmt[1])||statusLevel.equals(mgmt[2])||statusLevel.equals(mgmt[3])){
@@ -163,11 +179,26 @@ public class InventoryManager extends JFrame{
         }
         if(statusLevel.equals("Admin")){
             //set ability for creation of departments. Admins only!!!
+            
             JMenuItem newDepartment = new JMenuItem("New Department");
             newDepartment.setToolTipText("Create A New Department");
             newDepartment.addActionListener((ActionEvent event) ->{
-                String createNewDepartment = JOptionPane.showInputDialog("Enter New Department");
+                try {
+                    Employee e = new Employee();
+                    String createNewDepartment = JOptionPane.showInputDialog("Enter New Department");
+                    //Boolean isAdded = e.newDepartment(e.getDepts(), createNewDepartment);
+                    if(!e.newDepartment(e.getDepts(), createNewDepartment)){
+                        JOptionPane.showMessageDialog(null, "That department already exists.\nDepartment not added.");
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, "Department added.");
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
             });
+            create.add(new JSeparator());
             create.add(newDepartment);
             menubar.add(create);
         }
@@ -261,7 +292,7 @@ public class InventoryManager extends JFrame{
             JMenuItem empMaintenance = new JMenuItem("Employee Maintenance");
             personnel.add(empMaintenance);
             empMaintenance.setToolTipText("Employee Maintenance");
-            empMaintenance.addActionListener((ActionEvent event) ->{
+            empMaintenance.addActionListener((ActionEvent event)-> {
                 //Bring up maintenance menu with tabs
                 JFrame tab = new JFrame();
                 tab.setResizable(false);
@@ -313,23 +344,75 @@ public class InventoryManager extends JFrame{
                 addEmp.add(submitNewEmployee);
                 
                 //////////////////////////////////
-                //create the terminate/suspend tab
+                //create the terminate tab
                 JPanel fireEmp = new JPanel();
+                fireEmp.setLayout(null);
                 
                 Employee emp2 = new Employee();
                 
                 dept = new JLabel("Department");
+                JLabel emp = new JLabel("Employee");
                 getDept = null;
+                
+                JButton terminate = new JButton("Terminate");
+                terminate.addActionListener(new terminateListener());
+                
+                
+                
                 try {
                     getDept = new JComboBox(emp2.getDepts());
+                    //final JComboBox getEmp = new JComboBox();
+                    dept.setBounds(40,30,100,20);
+                    getDept.setBounds(145,30,135, 20); 
+                    
+                    emp.setBounds(40, 60, 100, 20);
+                    getEmp.setBounds(145, 60, 100, 20);
+                    
+                    terminate.setBounds(145, 90, 100, 20);
+
+                    getDept.addActionListener((ActionEvent e)->{
+                        //Get all the employees of the selected department
+                        //to prevent user from having to know excess information
+                        
+                        try {
+                            String firedDept = (String)getDept.getSelectedItem();
+
+                            ArrayList<String> empl;
+                            empl = emp2.getEmps(firedDept);
+                            String[] employees = new String[empl.size()];
+
+                            for(int count = 0; count < empl.size(); count++){
+                                employees[count] = empl.get(count);
+                            }
+
+                            DefaultComboBoxModel employeesModel = new DefaultComboBoxModel(employees);
+
+                            getEmp.setModel(new DefaultComboBoxModel(employees));
+                        } catch (SQLException ex) {
+                            Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+
+
+                    });
                 } catch (SQLException ex) {
                     Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                dept.setBounds(40,30,100,20);
-                getDept.setBounds(145,30,135, 20);
+                
+                
+           
+                
+                
+                
                 
                 fireEmp.add(dept);
                 fireEmp.add(getDept);
+                fireEmp.add(emp);
+                fireEmp.add(getEmp);
+                fireEmp.add(terminate);
+                
+                
+                          
                 //Create the promotions tab
                 JPanel promoteEmp = new JPanel();
                 
@@ -439,9 +522,15 @@ public class InventoryManager extends JFrame{
         submit.addActionListener(new saveItemListener());
         
         submit.setBounds(150, 255, 90, 30);
+        
+        
         panel.add(submit);
-        
-        
+        model = new JComboBox();
+                
+
+        model.setBounds(135, 185, 130, 30);
+        panel.add(model);
+        model.setEnabled(false);
         make.addActionListener ((ActionEvent e) -> {
             
             ArrayList<String> modelsList = null;
@@ -451,23 +540,22 @@ public class InventoryManager extends JFrame{
                 try {
                     modelsList = getVehicles.getModels(makeChoice);
                     
+                    
                 } catch (SQLException ex) {
                     Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
                  
                 String[] modelList = new String[modelsList.size()];
-            
+                
                 for(int count = 0; count<modelsList.size(); count++){
                     modelList[count] = modelsList.get(count);
                 }
-
-                model = new JComboBox(modelList);
-
-                model.setBounds(135, 185, 130, 30);
-                panel.add(model);
-                panel.revalidate();
+                DefaultComboBoxModel resetCombo = new DefaultComboBoxModel(modelList);
                 
                 
+                model.setModel(resetCombo);
+                model.setEnabled(true);
 
                 model.addActionListener((ActionEvent f) -> {
                     String modelChoice = (String)model.getSelectedItem();
@@ -476,13 +564,22 @@ public class InventoryManager extends JFrame{
                         VIN.setEditable(true);
                     }
                 });
+              
             }
             else{
                 if(VIN.isEnabled()){
                     VIN.setEnabled(false);
                     VIN.setEditable(false);
-                    panel.remove(model);
+                    
                 }
+            }
+            
+            
+        });
+        
+        VIN.addActionListener((ActionEvent event) -> {
+            if(make.getSelectedIndex() > 0 && model.getSelectedIndex() > -1 && !VIN.getText().equals("")){
+                submit.setEnabled(true);
             }
         });
         
@@ -511,6 +608,11 @@ public class InventoryManager extends JFrame{
         //then based on access modifier in db
         //allow certain actions or disallow
         InventoryManager login = new InventoryManager("login");
+    }
+    private class terminateListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            
+        }
     }
     private class searchVinActionListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
@@ -542,7 +644,22 @@ public class InventoryManager extends JFrame{
     }
     private class saveItemListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
-            
+            try {
+                //SAVE THE VEHICLE
+                vehicles vehicle = new vehicles();
+                String getMake = (String)make.getSelectedItem();
+                String getModel = (String)model.getSelectedItem();
+                String vin = VIN.getText();
+                Boolean isAdded = vehicle.addVehicle(getMake, getModel, vin);
+                if(!isAdded){
+                    JOptionPane.showMessageDialog(null, "VIN number already exists. Vehicle Not Added");
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Vehicle Added.");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     private class loginListener implements ActionListener{

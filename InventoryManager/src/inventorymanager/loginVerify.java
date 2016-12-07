@@ -69,10 +69,11 @@ public class loginVerify{
         
         if(doesNotContainSQL){
             isVerified = checkAgainstDB(this.username, this.password);
+            
         }
-        else{
+        else
             isVerified = false;
-        }
+        
         if(isVerified){
             return true;
         }
