@@ -202,7 +202,7 @@ public class InventoryManager extends JFrame{
             create.add(newDepartment);
             menubar.add(create);
         }
-        if(statusLevel.equals("Admin") || statusLevel.equals("Manager (Level 2") || statusLevel.equals("Manager (Level 3)")){
+        if(statusLevel.equals("Admin") || statusLevel.equals("Manager (Level 2)") || statusLevel.equals("Manager (Level 3)")){
             JMenu personnel = new JMenu("Personnel");
             
             JMenuItem newEmployee = new JMenuItem("Add New Employee");
@@ -259,7 +259,8 @@ public class InventoryManager extends JFrame{
                 getDept.setBounds(115, 121, 135, 20);
                 submitNewEmployee.setBounds(115, 151, 75, 30);
                 
-                getRank.setSelectedItem("New Hire");
+                getRank.setSelectedIndex(-1);
+                getDept.setSelectedIndex(-1);
                 getNewEmpInfo.add(newUsername);
                 getNewEmpInfo.add(getNewUsername);
                 getNewEmpInfo.add(fname);
@@ -331,7 +332,7 @@ public class InventoryManager extends JFrame{
                 getRank.setBounds(145, 120, 135, 20);
                 submitNewEmployee.setBounds(145, 150, 75, 30);
                 
-                getRank.setSelectedItem("New Hire");
+                getRank.setSelectedIndex(-1);
                 
                 addEmp.add(newUsername);
                 addEmp.add(getNewUsername);
@@ -361,6 +362,7 @@ public class InventoryManager extends JFrame{
                 
                 try {
                     getDept = new JComboBox(emp2.getDepts());
+                    getDept.setSelectedIndex(-1);
                     //final JComboBox getEmp = new JComboBox();
                     dept.setBounds(40,30,100,20);
                     getDept.setBounds(145,30,135, 20); 
@@ -369,6 +371,7 @@ public class InventoryManager extends JFrame{
                     getEmp.setBounds(145, 60, 100, 20);
                     
                     terminate.setBounds(145, 90, 100, 20);
+                    
 
                     getDept.addActionListener((ActionEvent e)->{
                         //Get all the employees of the selected department
@@ -531,6 +534,8 @@ public class InventoryManager extends JFrame{
         model.setBounds(135, 185, 130, 30);
         panel.add(model);
         model.setEnabled(false);
+        make.setSelectedIndex(-1);
+        model.setSelectedIndex(-1);
         make.addActionListener ((ActionEvent e) -> {
             
             ArrayList<String> modelsList = null;
@@ -612,6 +617,18 @@ public class InventoryManager extends JFrame{
     private class terminateListener implements ActionListener{
         public void actionPerformed(ActionEvent e){
             
+            try {
+                Employee emp = new Employee();
+                String dept = (String)getDept.getSelectedItem();
+                String empName = (String)getEmp.getSelectedItem();
+                emp.fireEmployee(dept, empName);
+                
+                getDept.setSelectedIndex(-1);
+                getEmp.setSelectedIndex(-1);
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(InventoryManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     private class searchVinActionListener implements ActionListener{
@@ -639,7 +656,7 @@ public class InventoryManager extends JFrame{
             getNewUsername.setText("");
             getFName.setText("");
             getLName.setText("");
-            getRank.setSelectedItem("New Hire");
+            getRank.setSelectedIndex(-1);
         }
     }
     private class saveItemListener implements ActionListener{

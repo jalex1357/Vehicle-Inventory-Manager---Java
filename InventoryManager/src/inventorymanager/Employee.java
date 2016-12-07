@@ -49,12 +49,38 @@ public class Employee{
     /*public String[] getEmployees(String dept){
         
     }*/
-    public void fireEmployee(){
+    public void fireEmployee(String dept, String empName) throws SQLException{
+        //Require username and password for termination verification
+        String username = JOptionPane.showInputDialog("Enter Username");
+        String password = JOptionPane.showInputDialog("Enter Password");
+        
+        loginVerify authenticate = new loginVerify();
+        
+        Boolean isAuthenticated = authenticate.check(username, password);
+        
+        String statusLevel = authenticate.getStatusLevel(username, password);
+        
+        myRs = myStmt.executeQuery("select employeeId from users where firstName + ' ' + lastName = '"+empName+"' and dept = '"+dept+"'");
+        int empId = 0;
+        while(myRs.next()){
+            empId = myRs.getInt("employeeId");
+        }
+        
+
+        
+        if(isAuthenticated && (statusLevel.equals("Admin") || statusLevel.equals("Manager (Level 2)") || statusLevel.equals("Manager (Level 3)"))){
+            int update = myStmt.executeUpdate("update users set accountStatus = 'Terminated' where employeeId = "+empId);
+        }
+        
+        JOptionPane.showMessageDialog(null, empName + " has been terminated.");
+        
+        
+        
         
     }
     public ArrayList<String> getEmps(String dept)throws SQLException{
         ArrayList<String> employees = new ArrayList<>();
-        myRs = myStmt.executeQuery("select firstName, lastName from users where dept = '"+dept+"' order by firstName");
+        myRs = myStmt.executeQuery("select firstName, lastName from users where dept = '"+dept+"' and employeeStatus = 'Normal' order by firstName");
         while(myRs.next()){
             if(!myRs.getString("firstName").equals("Test"))
                 employees.add(myRs.getString("firstName") + " "+ myRs.getString("lastName"));
